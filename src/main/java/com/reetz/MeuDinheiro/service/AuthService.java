@@ -27,15 +27,15 @@ public class AuthService {
         if (usuarioRepository.findByEmail(u.getEmail()).isPresent()) {
             throw new RuntimeException("Email já cadastrado");
         }
-        u.setSenha(passwordEncoder.encode(u.getSenha())); // hash seguro
+        u.setPassword(passwordEncoder.encode(u.getPassword())); // hash seguro
         return usuarioRepository.save(u);
     }
 
     public String login(String email, String senha) {
         Usuario user = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        if (!passwordEncoder.matches(senha, user.getSenha())) {
+        if (!passwordEncoder.matches(senha, user.getPassword())) {
             throw new RuntimeException("Senha inválida");
         }
 

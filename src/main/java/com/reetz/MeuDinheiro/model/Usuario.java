@@ -12,7 +12,7 @@ public class Usuario {
 
     private String nome;
     private String email;
-    private String senha;
+    private String password;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Categoria> categorias;
@@ -32,8 +32,8 @@ public class Usuario {
         return email;
     }
 
-    public String getSenha() {
-        return senha;
+    public String getPassword() {
+        return password;
     }
 
     public List<Categoria> getCategorias() {
@@ -52,8 +52,8 @@ public class Usuario {
         this.email = email;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setCategorias(List<Categoria> categorias) {
