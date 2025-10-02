@@ -10,7 +10,7 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nome;
+    private String username;
     private String email;
     private String password;
 
@@ -24,8 +24,8 @@ public class Usuario {
         return id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getUsername() {
+        return username;
     }
 
     public String getEmail() {
@@ -44,8 +44,8 @@ public class Usuario {
         return transacoes;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setEmail(String email) {
