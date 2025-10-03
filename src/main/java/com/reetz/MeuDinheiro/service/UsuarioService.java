@@ -18,33 +18,21 @@ public class UsuarioService implements UserDetailsService {
     @Autowired
     private final UsuarioRepository usuarioRepository;
 
-
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByEmail(email);
-        if (usuario == null) {
-            throw new UsernameNotFoundException("Usuário não encontrado");
-        }
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+
         return User.builder()
-                .username(usuario.getUsername())
+                .username(usuario.getUsername()) // username ainda é usado como "identificador" no token
                 .password(usuario.getPassword())
                 .roles("USER")
                 .build();
     }
 
-//    @Override
-//    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-//        Usuario usuario = usuarioRepository.findByEmail(email)
-//                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-//
-//        return org.springframework.security.core.userdetails.User
-//                .withUsername(usuario.getEmail())
-//                .password(usuario.getPassword())
-//                .authorities("USER")
-//                .build();
-//
-//  }
+    public UserDetails loadUserByEmail(String email) {
+        return loadUserByUsername(email);
+    }
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
@@ -63,7 +51,8 @@ public class UsuarioService implements UserDetailsService {
     }
 
     public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.findByEmail(email);
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
     public void deletar(Long id) {

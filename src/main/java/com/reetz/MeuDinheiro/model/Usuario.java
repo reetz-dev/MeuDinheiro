@@ -52,8 +52,8 @@ public class Usuario {
         this.email = email;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String encode) {
+        this.password = encode;
     }
 
     public void setCategorias(List<Categoria> categorias) {
