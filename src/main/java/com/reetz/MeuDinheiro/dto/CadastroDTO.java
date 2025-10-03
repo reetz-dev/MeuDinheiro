@@ -1,6 +1,7 @@
 package com.reetz.MeuDinheiro.dto;
 
-public record CadastroDTO (String nome, String email, String password) {
-
-}
-
+public record CadastroDTO (
+        String username,
+        String email,
+        String password
+) {}

@@ -1,5 +1,5 @@
 package com.reetz.MeuDinheiro.dto;
 
-public record LoginRequestDTO (String email, Long password) {
+public record LoginRequestDTO (String email, String password) {
 
 }
