@@ -2,7 +2,6 @@ package com.reetz.MeuDinheiro.service;
 
 import com.reetz.MeuDinheiro.config.JwtUtil;
 import com.reetz.MeuDinheiro.dto.CadastroDTO;
-import com.reetz.MeuDinheiro.dto.CadastroResponseDTO;
 import com.reetz.MeuDinheiro.dto.LoginRequestDTO;
 import com.reetz.MeuDinheiro.dto.LoginResponseDTO;
 import com.reetz.MeuDinheiro.model.Usuario;
@@ -38,12 +37,21 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String signup(Usuario usuario) {
-        if (usuarioRepository.existsByUsername(usuario.getUsername())) {
+
+    public String cadastro(CadastroDTO request) {
+        if (usuarioRepository.existsByUsername(request.username())) {
             throw new RuntimeException("Nome de usuário já existe");
         }
 
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        if (usuarioRepository.existsByEmail(request.email())) {
+            throw new RuntimeException("Email já existe");
+        }
+
+        Usuario usuario = new Usuario();
+        usuario.setUsername(request.username());
+        usuario.setEmail(request.email());
+        usuario.setPassword(passwordEncoder.encode(request.password()));
+
         usuarioRepository.save(usuario);
         return "Usuário criado com sucesso";
     }
@@ -55,81 +63,12 @@ public class AuthService {
                 )
         );
 
-        UserDetails userDetails = usuarioService.loadUserByUsername(authRequest.email());
-        String token = jwtUtil.gerarToken(userDetails.getUsername());
+        UserDetails userDetails = usuarioService.loadUserByEmail(authRequest.email());
+        String token = jwtUtil.gerarToken(userDetails.getUsername()); // continua colocando username no token
 
-        Usuario usuario = usuarioRepository.findByEmail(authRequest.email());
+        Usuario usuario = usuarioRepository.findByEmail(authRequest.email())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         return new LoginResponseDTO(token, usuario.getId());
     }
 }
-
-/*
-@Service
-public class AuthService {
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-
-    public Usuario cadastrar(CadastroDTO dto) {
-        if (usuarioRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new RuntimeException("Email já cadastrado");
-        }
-
-        Usuario u = new Usuario();
-        u.setNome(dto.getNome());
-        u.setEmail(dto.getEmail());
-        u.setPassword(passwordEncoder.encode(dto.getPassword()));
-
-        return usuarioRepository.save(u);
-    }
-
-    public String login(String email, String senha) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        if (!passwordEncoder.matches(senha, usuario.getPassword())) {
-            throw new RuntimeException("Senha inválida");
-        }
-
-        UserDetails userDetails = org.springframework.security.core.userdetails.User
-                .withUsername(usuario.getEmail())
-                .password(usuario.getPassword())
-                .authorities("USER")
-                .build();
-
-        return jwtUtil.generateToken(userDetails);
-    }
-
-//    public String login(String email, String senha) {
-//        Usuario user = usuarioRepository.findByEmail(email)
-//                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-//
-//        if (!passwordEncoder.matches(senha, user.getPassword())) {
-//            throw new RuntimeException("Senha inválida");
-//        }
-//
-//        return Jwts.builder()
-//                .setSubject(user.getId().toString())
-//                .claim("name", user.getNome())
-//                .claim("role", "USER")
-//                .setIssuedAt(new Date())
-//                .setExpiration(new Date(System.currentTimeMillis() + 3600_000))
-//                .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()), SignatureAlgorithm.HS256)
-//                .compact();
-//    }
-
-    private final JwtUtil jwtUtil;
-
-    public AuthService(UsuarioRepository usuarioRepository, JwtUtil jwtUtil) {
-        this.usuarioRepository = usuarioRepository;
-        this.jwtUtil = jwtUtil;
-    }
-}
-
-*/
